@@ -22,7 +22,16 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const login = async (req, res) => {
+  try {
+    res.status(200).json({ message: "login successful" });
+  } catch (error) {
+    res.status(501).json({ message: error.message, error: error });
+  }
+};
+
 module.exports = {
   signupUser: signupUser,
   getAllUsers: getAllUsers,
+  login: login,
 };
