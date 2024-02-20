@@ -6,7 +6,7 @@ const saltRounds = parseInt(process.env.SALT_ROUNDS);
 
 const hashPass = async (req, res, next) => {
   try {
-    hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+    const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
 
     req.body.password = hashedPassword;
 
@@ -31,6 +31,8 @@ const comparePass = async (req, res, next) => {
     if (!passwordMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
+
+    req.user = user;
 
     next();
   } catch (error) {

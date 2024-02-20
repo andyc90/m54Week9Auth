@@ -24,7 +24,12 @@ const getAllUsers = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    res.status(200).json({ message: "login successful" });
+    const authenticatedUser = req.user;
+
+    res.status(200).json({
+      message: `${authenticatedUser.username} logged in successfully`,
+      data: authenticatedUser,
+    });
   } catch (error) {
     res.status(501).json({ message: error.message, error: error });
   }
