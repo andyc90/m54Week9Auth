@@ -2,12 +2,32 @@ const User = require("./model");
 
 const signupUser = async (req, res) => {
   try {
-    const user = await User.create({
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password,
+    const { username, email, password } = req.body;
+
+    // Check if the username already exists
+    const existingUsername = await User.findOne({
+      where: { username: username },
     });
-    res.status(201).json({ message: "user added", user: user });
+
+    if (existingUsername) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
+    // Check if the email already exists
+    const existingEmail = await User.findOne({ where: { email: email } });
+
+    if (existingEmail) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    // If username and email don't exist, proceed with user registration
+    const user = await User.create({
+      username: username,
+      email: email,
+      password: password,
+    });
+
+    res.status(201).json({ message: "User added", user: user });
   } catch (error) {
     res.status(500).json({ message: error.message, error: error });
   }

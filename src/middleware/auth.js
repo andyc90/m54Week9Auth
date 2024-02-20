@@ -40,7 +40,39 @@ const comparePass = async (req, res, next) => {
   }
 };
 
+const registerUser = async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    // Check if the username or email already exists
+    const existingUser = await User.findOne({
+      where: {
+        [Op.or]: [{ username: username }, { email: email }],
+      },
+    });
+
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: "Username or email already exists" });
+    }
+
+    // If username and email don't exist, proceed with user registration
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const newUser = await User.create({
+      username: username,
+      email: email,
+      password: hashedPassword,
+    });
+
+    res.status(201).json({ user: newUser });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
+  registerUser: registerUser,
   hashPass: hashPass,
   comparePass: comparePass,
 };
