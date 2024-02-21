@@ -100,8 +100,8 @@ const deleteAllUsers = async (req, res) => {
   try {
     // Deleting all users from the database
     await User.destroy({
-      where: {}, // Empty condition to delete all users
-      truncate: true, // Truncate option to reset auto-increment counter
+      where: {},
+      truncate: true,
     });
 
     // Sending a successful response
