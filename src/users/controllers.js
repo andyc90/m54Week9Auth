@@ -68,9 +68,93 @@ const login = async (req, res) => {
   }
 };
 
+// Function for deleting a user
+const deleteUser = async (req, res) => {
+  try {
+    // Extracting user ID from request parameters
+    const userId = req.body.userId;
+
+    // Finding the user in the database by ID
+    const userToDelete = await User.findOne({
+      where: { id: userId },
+    });
+
+    // Checking if the user exists
+    if (!userToDelete) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Deleting the user
+    await userToDelete.destroy();
+
+    // Sending a successful response
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    // Handling any errors that occur during user deletion
+    res.status(500).json({ message: error.message, error: error });
+  }
+};
+
+// Function for deleting all users
+const deleteAllUsers = async (req, res) => {
+  try {
+    // Deleting all users from the database
+    await User.destroy({
+      where: {}, // Empty condition to delete all users
+      truncate: true, // Truncate option to reset auto-increment counter
+    });
+
+    // Sending a successful response
+    res.status(200).json({ message: "All users deleted successfully" });
+  } catch (error) {
+    // Handling any errors that occur during user deletion
+    res.status(500).json({ message: error.message, error: error });
+  }
+};
+
+// Function for updating user
+const updateUser = async (req, res) => {
+  try {
+    // Extract user ID from request parameters
+    const { userId } = req.params;
+
+    // Checks if the userId is provided in URL parameters
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ message: "User ID is required in the request parameters" });
+    }
+
+    // Finds the user with the given ID
+    const user = await User.findOne({ where: { id: userId } });
+
+    // Checks if the user exists
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Updates the user dynamically based on the request body
+    for (const key in req.body) {
+      user[key] = req.body[key];
+    }
+
+    // Save the updated user
+    await user.save();
+
+    // Sending a successful response with the updated user
+    res.status(200).json({ message: "User updated successfully", user });
+  } catch (error) {
+    // Handling any errors that occur during user update
+    res.status(500).json({ message: error.message, error: error });
+  }
+};
+
 // Exporting the functions to be used in other parts of the application
 module.exports = {
   signupUser: signupUser,
   getAllUsers: getAllUsers,
   login: login,
+  deleteUser: deleteUser,
+  deleteAllUsers: deleteAllUsers,
+  updateUser: updateUser,
 };
